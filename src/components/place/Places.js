@@ -5,36 +5,8 @@ import PlaceCard from './PlaceCard';
 // Import your icons here
 // import { Bars3Icon, BellIcon, XMarkIcon } from 'Your icon library';
 
-const Places = ({addListUrl, addText}) => {
-  const [places] = useState([
-    {
-      name: 'Pizzeria Picco',
-      rating: 4.6,
-      price: '$$',
-      category: 'Pizza',
-      area: 'Larkspur',
-      note: 'California-influenced Neapolitan pies',
-      try_out: ['Dine-in', 'Take Out', 'No Contact Delivery'],
-    },
-    {
-      name: 'Square Pie Guys',
-      rating: 4.4,
-      price: '$',
-      category: 'Pizza',
-      area: 'San Francisco',
-      note: 'Brooklyn / deloitte deep style pizza',
-      try_out: [ 'Dine-in', 'Take Out', 'Delivery' ]
-    },
-    {
-      name: 'Nourish Cafe',
-      rating: 4.5,
-      price: '$$',
-      category: 'Vegan',
-      area: 'San Francisco',
-      note: 'Health-focused cafe for salads & more',
-      try_out: [ 'Dine-in', 'Take Out', 'Delivery' ]
-    },
-  ]);
+const Places = ({places, addListUrl, addText, addPlace}) => {
+  
   const [visibility, setVisibility] = useState({
     addMenu: false,
     mapsListInput: false,
@@ -49,6 +21,12 @@ const Places = ({addListUrl, addText}) => {
     console.log('add via maps list');
     // Handle the action here
     addListUrl();
+    setVisibility({ ...visibility, addMenu: false });
+  };
+
+  const addViaPlaceDetails = () => {
+    console.log('add via place details');
+    addPlace();
     setVisibility({ ...visibility, addMenu: false });
   };
 
@@ -81,6 +59,11 @@ const Places = ({addListUrl, addText}) => {
               </button>
             </Menu.Item>
             <Menu.Item>
+              <button className="block px-4 py-2 text-sm text-gray-700" onClick={addViaPlaceDetails}>
+                Place Details
+              </button>
+            </Menu.Item>
+            <Menu.Item>
               <button className="block px-4 py-2 text-sm text-gray-700" onClick={addViaText}>
                 Paragraph Text
               </button>
@@ -88,14 +71,14 @@ const Places = ({addListUrl, addText}) => {
           </Menu.Items>
         </Menu>
       </div>
-      {places.map((place, index) => (
+      {places && places.map((place, index) => (
         <PlaceCard key={index} place={place} />
       ))}
-      <div className="p-4">
+      {/* <div className="p-4">
         <div className="pointer-events-auto rounded-md px-4 py-2 text-center font-medium shadow-sm ring-1 ring-slate-700/10 hover:bg-slate-50">
           View all
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
