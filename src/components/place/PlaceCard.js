@@ -1,26 +1,66 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import PlacesContext from '../../contexts/PlacesContext';
 import IconEdit from '../icons/IconEdit';
 import IconDelete from '../icons/IconDelete';
 import IconArrowRight from '../icons/IconArrowRight';
 import '../../assets/styles/PlaceCard.css';
-import { updatePlace, deletePlace, textToSpeech } from '../../api';
+import { getAWSCredentials, updatePlace, deletePlace } from '../../api';
+import { Polly, config } from 'aws-sdk';
 
 const PlaceCard = ({ place }) => {
+  const audioRef = useRef(null);
+
   const { places, setPlaces } = useContext(PlacesContext);
   const [ edittedNotes, setEdittedNotes ] = useState(place.notes);
   const [visibility, setVisibility] = useState({
     editField: false
   });
 
+  // useEffect
+  useEffect(() => {
+    async function fetchData() {
+      const response = await getAWSCredentials();
+      if (response) {
+        const credentials = response;
+        config.update({
+          accessKeyId: credentials.AccessKeyId,
+          secretAccessKey: credentials.SecretAccessKey,
+          region: credentials.Region
+        });
+      }
+    }
+    fetchData();
+  }, []);
+
   const toggleVisibility = (key) => {
     setVisibility({ ...visibility, [key]: !visibility[key] });
   };
 
   const makePollySay = () => {
-    const text = place.name + " Notes " + place.notes;
-    console.log(text);
-    return textToSpeech(text);
+    const textToRead = `<speak> ${place.name} <break time="1s"/> Notes <break time="0.5s"/> ${place.notes} </speak>`;
+    console.log(textToRead);
+    // return textToSpeech(text);
+    const polly = new Polly();
+    const params = {
+      OutputFormat: 'mp3',
+      Text: textToRead,
+      VoiceId: textToRead ? 'Raveena' : 'Matthew',
+      TextType: 'ssml'
+    };
+
+    polly.synthesizeSpeech(params, (err, data) => {
+      if (err) {
+        console.error('Error synthesizing speech:', err);
+      } else {
+        const audioData = new Uint8Array(data.AudioStream);
+        const base64Audio = btoa(
+          String.fromCharCode.apply(null, audioData)
+        );
+        const audioUrl = `data:audio/mp3;base64,${base64Audio}`;
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+      }
+    });
     // TODO: add a feature to calculate distance and travel time from current location.
   };
 
@@ -30,7 +70,7 @@ const PlaceCard = ({ place }) => {
       notes: edittedNotes
     };
     const response = await updatePlace(updatedPlace);
-    if (response.status === 200) {
+    if (response && response.status === 200) {
       setPlaces(places.map((p) => (p.id === place.id ? updatedPlace : p)));
     }
     toggleVisibility('editField');
@@ -57,7 +97,7 @@ const PlaceCard = ({ place }) => {
             <div className="flex items-center gap-1 text-gray-500">
               {/* icon size 24 */}
               {/* <p className="text-xs font-medium">{place.price}</p> */}
-              <span className="hidden sm:block" aria-hidden="true">&middot;</span>
+              {/* <span className="hidden sm:block" aria-hidden="true">&middot;</span> */}
               <strong className="rounded border border-light-gray-500 bg-gray-0 px-2 py-0.25 text-[10px] font-medium hover:bg-gray-100">
                 {place.category}
               </strong>
@@ -110,6 +150,7 @@ const PlaceCard = ({ place }) => {
         </div>
         <button
           onClick={makePollySay}
+          // add audioref
           className="btn pointer-events-auto ml-4 sm:ml-0 flex-none rounded-md px-2 py-[0.3125rem] font-medium text-slate-700"
         >
           {/* Voice Grid */}
@@ -123,6 +164,7 @@ const PlaceCard = ({ place }) => {
             </div>
           </div>
         </button>
+        <audio ref={audioRef} />
       </div>
     </div>
   );

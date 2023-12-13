@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://cors-anywhere.herokuapp.com/https://x5cbyxsmwl.execute-api.us-west-2.amazonaws.com/api',
+    baseURL: 'https://cors-anywhere.herokuapp.com/https://x5cbyxsmwl.execute-api.us-west-2.amazonaws.com/api',
 });
+const userId = localStorage.getItem('userId');
 
 const searchOSM = async (query_str) => {
     const base_url = 'https://nominatim.openstreetmap.org/search?format=json&q=';
@@ -10,18 +11,27 @@ const searchOSM = async (query_str) => {
     try {
         const response = await axios.get(url);
         return response.data;
-      } catch (error) {
+    } catch (error) {
         console.error(error);
-      }
+    }
+}
+
+export const getAWSCredentials = async () => {
+    try {
+        const response = await api.get('/credentials');
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const getPlaces = async () => {
     try {
-        const response = await api.get('/places');
+        const response = await api.get('/places?userId=' + userId);
         return response.data;
-      } catch (error) {
+    } catch (error) {
         console.error(error);
-      }
+    }
 }
 
 export const addPlace = async (place) => {
@@ -29,6 +39,7 @@ export const addPlace = async (place) => {
         place["city"] = "San Francisco";
         const details = await searchOSM(place.name + " " + place.city);
         if (details.length > 0) {
+            place.userId = userId;
             place.about = ""
             place.lat = details[0].lat;
             place.lon = details[0].lon;
@@ -39,18 +50,18 @@ export const addPlace = async (place) => {
         const response = await api.post('/places', [ place ]);
         console.log(`response`, response);
         return response.data;
-      } catch (error) {
+    } catch (error) {
         console.error(error);
-      }
+    }
 }
 
 export const updatePlace = async (place) => {
     try {
         const response = await api.put(`/places/${place.id}`, place);
         return response;
-      } catch (error) {
+    } catch (error) {
         console.error(error);
-      }
+    }
 }
 
 export const deletePlace = async (place) => {

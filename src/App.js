@@ -1,35 +1,42 @@
-// import logo from './logo.svg';
-import { Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-// import Layout from './layout/Layout';
 import Home from './components/Home';
+import SecurePage from './components/SecurePage';
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const isAuthenticated = () => { 
+    const userId = localStorage.getItem('userId');
+    return userId!== null; 
+  }
+  const ProtectedRoute = ({ children }) => {
+    return isAuthenticated() ? children : <Navigate to="/signin" />;
+  };
+
+  useEffect(() => {
+    // Replace this with your actual authentication check
+    const checkAuthentication = async () => {
+      await isAuthenticated();
+      setIsLoading(false);
+    };
+    checkAuthentication();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  
   return (
     <div className="App">
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header> */}
-      {/* <Layout>
-        <div className="h-screen w-screen">
-          <img src={SFMap} alt="SF Map background" className="h-full w-full object-cover" />
-        </div>
-      </Layout> */}
       <Routes>
-        <Route path="/" element={<Home />}>
-          {/* <Route index element={<Home />} /> */}
-        </Route>
+        <Route path='/secure-page' element={<SecurePage/>} />
+        <Route path='/signin' element={<SignIn/>} />
+        <Route path='/signup' element={<SignUp/>} />
+        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>}></Route>
       </Routes>
     </div>
   );
