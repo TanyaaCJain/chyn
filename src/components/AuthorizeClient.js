@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 
-const SecurePage = () => {
+const AuthorizeClient = () => {
     useEffect(() => {
         const hash = window.location.hash.substring(1);
         console.log('hash', hash); // 'access_token=...&scope=...&id_token=...&token_type=...&expires_in=...
@@ -40,4 +40,4 @@ const SecurePage = () => {
   );
 };
 
-export default SecurePage;
+export default AuthorizeClient;

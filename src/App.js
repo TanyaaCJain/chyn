@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Home from './components/Home';
-import SecurePage from './components/SecurePage';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
+import AuthorizeClient from './components/AuthorizeClient';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +33,7 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path='/secure-page' element={<SecurePage/>} />
+        <Route path='/authorize-client' element={<AuthorizeClient/>} />
         <Route path='/signin' element={<SignIn/>} />
         <Route path='/signup' element={<SignUp/>} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>}></Route>
