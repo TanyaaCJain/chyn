@@ -1,12 +1,11 @@
 // YourMainComponent.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu } from '@headlessui/react';
 import PlaceCard from './PlaceCard';
-// Import your icons here
-// import { Bars3Icon, BellIcon, XMarkIcon } from 'Your icon library';
+import { getAWSCredentials } from '../../api';
+import { config } from 'aws-sdk';
 
 const Places = ({places, addListUrl, addText, addPlace}) => {
-  
   const [visibility, setVisibility] = useState({
     addMenu: false,
     mapsListInput: false,
@@ -36,6 +35,22 @@ const Places = ({places, addListUrl, addText, addPlace}) => {
     addText();
     setVisibility({ ...visibility, addMenu: false });
   };
+
+  // useEffect
+  useEffect(() => {
+    async function fetchData() {
+      const response = await getAWSCredentials();
+      if (response) {
+        const credentials = response;
+        config.update({
+          accessKeyId: credentials.AccessKeyId,
+          secretAccessKey: credentials.SecretAccessKey,
+          region: credentials.Region
+        });
+      }
+    }
+    fetchData();
+  }, []);
 
   return (
     <div className="place-card w-full divide-y divide-slate-400/20 rounded-lg bg-white text-[0.8125rem] leading-5 text-slate-900 shadow-xl shadow-black/5 ring-1 ring-slate-700/10">
@@ -72,13 +87,8 @@ const Places = ({places, addListUrl, addText, addPlace}) => {
         </Menu>
       </div>
       {places && places.map((place, index) => (
-        <PlaceCard key={index} place={place} />
+        <PlaceCard key={index} place={place}/>
       ))}
-      {/* <div className="p-4">
-        <div className="pointer-events-auto rounded-md px-4 py-2 text-center font-medium shadow-sm ring-1 ring-slate-700/10 hover:bg-slate-50">
-          View all
-        </div>
-      </div> */}
     </div>
   );
 };

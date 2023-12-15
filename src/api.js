@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://cors-anywhere.herokuapp.com/https://x5cbyxsmwl.execute-api.us-west-2.amazonaws.com/api',
+    baseURL: 'https://x5cbyxsmwl.execute-api.us-west-2.amazonaws.com/api',
 });
 const userId = localStorage.getItem('userId');
 
@@ -25,12 +25,18 @@ export const getAWSCredentials = async () => {
     }
 }
 
-export const getPlaces = async () => {
+export const getPlaces = async (lat = null, lon = null) => {
     try {
-        const response = await api.get('/places?userId=' + userId);
+        let url = '/places?userId=' + userId;
+        if (lat && lon) {
+            url += '&lat=' + lat + '&lon=' + lon;
+        }
+        console.log(`url`, url);
+        const response = await api.get(url);
         return response.data;
     } catch (error) {
         console.error(error);
+        return [];
     }
 }
 

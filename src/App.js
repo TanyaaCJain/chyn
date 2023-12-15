@@ -4,6 +4,7 @@ import './App.css';
 import Home from './components/Home';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
+import SignOut from './components/SignOut';
 import AuthorizeClient from './components/AuthorizeClient';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         <Route path='/authorize-client' element={<AuthorizeClient/>} />
         <Route path='/signin' element={<SignIn/>} />
         <Route path='/signup' element={<SignUp/>} />
+        <Route path='/signout' element={<SignOut/>} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>}></Route>
       </Routes>
     </div>

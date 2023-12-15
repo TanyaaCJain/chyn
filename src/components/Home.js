@@ -7,6 +7,9 @@ import { getPlaces, addPlace } from '../api';
 import PlacesContext from '../contexts/PlacesContext';
 
 const Home = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [lat, setLat] = useState(null);
+    const [lng, setLng] = useState(null);
     const [visibility, setVisibility] = useState({
         mapsListURLInput: false,
         paragraphInput: false
@@ -47,9 +50,15 @@ const Home = () => {
     // ]);
     const [places, setPlaces] = useState([]);
     const fetchPlaces = async () => {
-        const data = await getPlaces();
+        let data = {}
+        if (lat && lng) {
+            data = await getPlaces(lat, lng);
+        } else {
+            data = await getPlaces();
+        }
         console.log(`data`, data);
         setPlaces(data);
+        setIsLoading(false);
     };
 
     const submitMapsListURL = () => {
@@ -73,22 +82,68 @@ const Home = () => {
         }
     }
 
+    const getCurrentLocation = async () => {
+        if (!navigator.geolocation) {
+            console.log('Geolocation is not supported by your browser');
+            return;
+        }
+        await navigator.geolocation.getCurrentPosition(
+            (position) => {
+              
+              console.log(`position`, position.coords.latitude, position.coords.longitude);
+              setLat(position.coords.latitude);
+              setLng(position.coords.longitude);
+              console.log(`location`, lat, lng);
+              setIsLoading(false);
+            //   fetchPlaces();
+            },
+            () => {
+                console.log('Unable to retrieve your location');
+                // setLocation({
+                //     lat: "37.7814181", 
+                //     lon: "-122.4447141"
+                // })
+                setIsLoading(false);
+                // fetchPlaces();
+                return;
+            }
+        );
+    }
+
     // Functions run on page load
     useEffect(() => {
-        fetchPlaces();
+        getCurrentLocation();
     }, []);
+
+    useEffect(() => {
+        if (lat !== null && lng !== null) {
+            setIsLoading(true);
+            console.log("calling fetchPlaces");
+            fetchPlaces();
+        }
+    }, [lat, lng]);
 
     return (
         <PlacesContext.Provider value={{ places, setPlaces }}>
             <Layout>
                 <SliderCard className="place-items-center px-4 pt-20 sm:px-6 lg:px-8 pb-20"
                     alwaysVisibleContent={
-                        <Places
-                            places={places}
-                            addListUrl={() => toggleVisibility('mapsListURLInput')}
-                            addText={() => toggleVisibility('paragraphInput')}
-                            addPlace={() => toggleVisibility('placeText')}
-                        />
+                        <>
+                        {isLoading && (
+                            <div className="flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-4 
+                                border-gray-200"></div>
+                            </div>
+                        )}
+                        {!isLoading && (
+                            <Places
+                                places={places}
+                                addListUrl={() => toggleVisibility('mapsListURLInput')}
+                                addText={() => toggleVisibility('paragraphInput')}
+                                addPlace={() => toggleVisibility('placeText')}
+                            />
+                        )}
+                        </>
                     }
                     expandedContent={
                         <>

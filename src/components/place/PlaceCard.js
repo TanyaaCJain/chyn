@@ -4,8 +4,8 @@ import IconEdit from '../icons/IconEdit';
 import IconDelete from '../icons/IconDelete';
 import IconArrowRight from '../icons/IconArrowRight';
 import '../../assets/styles/PlaceCard.css';
-import { getAWSCredentials, updatePlace, deletePlace } from '../../api';
-import { Polly, config } from 'aws-sdk';
+import { updatePlace, deletePlace } from '../../api';
+import { Polly } from 'aws-sdk';
 
 const PlaceCard = ({ place }) => {
   const audioRef = useRef(null);
@@ -19,15 +19,13 @@ const PlaceCard = ({ place }) => {
   // useEffect
   useEffect(() => {
     async function fetchData() {
-      const response = await getAWSCredentials();
-      if (response) {
-        const credentials = response;
-        config.update({
-          accessKeyId: credentials.AccessKeyId,
-          secretAccessKey: credentials.SecretAccessKey,
-          region: credentials.Region
-        });
-      }
+      // const response = await getAWSCredentials();
+        // const credentials = response;
+      // config.update({
+      //   accessKeyId: creds.AccessKeyId,
+      //   secretAccessKey: creds.SecretAccessKey,
+      //   region: creds.Region
+      // });
     }
     fetchData();
   }, []);
@@ -37,8 +35,11 @@ const PlaceCard = ({ place }) => {
   };
 
   const makePollySay = () => {
-    const textToRead = `<speak> ${place.name} <break time="1s"/> Notes <break time="0.5s"/> ${place.notes} </speak>`;
-    console.log(textToRead);
+    let textToRead = `<speak> ${place.name} <break time="0.6s"/> Saved for <break time="0.3s"/> ${place.notes} </speak>`;
+    if (place.dis) {
+      textToRead = `<speak> ${place.name} is ${place.dis.toFixed(2)} miles away.
+    <break time="0.6s"/> Saved for <break time="0.3s"/> ${place.notes} </speak>`;
+    }
     // return textToSpeech(text);
     const polly = new Polly();
     const params = {
@@ -96,8 +97,11 @@ const PlaceCard = ({ place }) => {
           <div className="sm:flex sm:items-center sm:gap-2">
             <div className="flex items-center gap-1 text-gray-500">
               {/* icon size 24 */}
-              {/* <p className="text-xs font-medium">{place.price}</p> */}
-              {/* <span className="hidden sm:block" aria-hidden="true">&middot;</span> */}
+              {/* check iff place has key 'dis' then display with round off to two decimal places */}
+              {place.dis && <>
+                <p className="text-xs font-medium">{place.dis.toFixed(2)}</p>
+                <span className="hidden sm:block" aria-hidden="true">&middot;</span>
+              </>}
               <strong className="rounded border border-light-gray-500 bg-gray-0 px-2 py-0.25 text-[10px] font-medium hover:bg-gray-100">
                 {place.category}
               </strong>
