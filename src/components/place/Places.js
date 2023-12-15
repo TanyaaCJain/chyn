@@ -1,9 +1,6 @@
-// YourMainComponent.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Menu } from '@headlessui/react';
 import PlaceCard from './PlaceCard';
-import { getAWSCredentials } from '../../api';
-import { config } from 'aws-sdk';
 
 const Places = ({places, addListUrl, addText, addPlace}) => {
   const [visibility, setVisibility] = useState({
@@ -11,14 +8,8 @@ const Places = ({places, addListUrl, addText, addPlace}) => {
     mapsListInput: false,
   });
 
-  // const toggleAddMenu = (event) => {
-  //   event.preventDefault();
-  //   setVisibility({ ...visibility, addMenu: !visibility.addMenu });
-  // };
-
   const addViaMapsList = () => {
     console.log('add via maps list');
-    // Handle the action here
     addListUrl();
     setVisibility({ ...visibility, addMenu: false });
   };
@@ -31,26 +22,9 @@ const Places = ({places, addListUrl, addText, addPlace}) => {
 
   const addViaText = () => {
     console.log('add via text');
-    // Handle the action here
     addText();
     setVisibility({ ...visibility, addMenu: false });
   };
-
-  // useEffect
-  useEffect(() => {
-    async function fetchData() {
-      const response = await getAWSCredentials();
-      if (response) {
-        const credentials = response;
-        config.update({
-          accessKeyId: credentials.AccessKeyId,
-          secretAccessKey: credentials.SecretAccessKey,
-          region: credentials.Region
-        });
-      }
-    }
-    fetchData();
-  }, []);
 
   return (
     <div className="place-card w-full divide-y divide-slate-400/20 rounded-lg bg-white text-[0.8125rem] leading-5 text-slate-900 shadow-xl shadow-black/5 ring-1 ring-slate-700/10">
@@ -78,7 +52,7 @@ const Places = ({places, addListUrl, addText, addPlace}) => {
                 Place Details
               </button>
             </Menu.Item>
-            <Menu.Item style={{ display: 'none' }}>
+            <Menu.Item>
               <button className="block px-4 py-2 text-sm text-gray-700" onClick={addViaText}>
                 Paragraph Text
               </button>

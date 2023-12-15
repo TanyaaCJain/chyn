@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../assets/styles/SliderCard.css';
-// import SFMap from '../assets/img/SFMap.jpg';
 import MyMapComponent from './MyMapComponent';
 
 const SliderCard = ({ places, alwaysVisibleContent, expandedContent }) => {
   let [isExpanded, setIsExpanded] = useState(false);
-  // let [startY, setStartY] = useState(0);
   const initialHeight = useRef(350); // Initial card height in px
   const [currentHeight, setCurrentHeight] = useState(350);
+  // let [startY, setStartY] = useState(0);
   // const [isDragging, setIsDragging] = useState(false);
   let cardRef = useRef(null);
 
@@ -71,7 +70,6 @@ const SliderCard = ({ places, alwaysVisibleContent, expandedContent }) => {
   return (
     <>
       <div className="h-screen w-screen">
-        {/* <img src={SFMap} alt="SF Map background" className="h-full w-full object-cover" /> */}
         <MyMapComponent places={places} />
       </div>
       <div className="relative h-screen z-30">

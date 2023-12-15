@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import PlacesContext from '../../contexts/PlacesContext';
 import IconEdit from '../icons/IconEdit';
 import IconDelete from '../icons/IconDelete';
@@ -19,20 +19,6 @@ const PlaceCard = ({ place }) => {
   });
   const { setMapCenter } = useContext(MapCenterContext);
 
-  // useEffect
-  useEffect(() => {
-    async function fetchData() {
-      // const response = await getAWSCredentials();
-        // const credentials = response;
-      // config.update({
-      //   accessKeyId: creds.AccessKeyId,
-      //   secretAccessKey: creds.SecretAccessKey,
-      //   region: creds.Region
-      // });
-    }
-    fetchData();
-  }, []);
-
   const toggleVisibility = (key) => {
     setVisibility({ ...visibility, [key]: !visibility[key] });
   };
@@ -43,7 +29,6 @@ const PlaceCard = ({ place }) => {
       textToRead = `<speak> ${place.name} is ${place.dis.toFixed(2)} miles away.
     <break time="0.6s"/> Saved for <break time="0.3s"/> ${place.notes} </speak>`;
     }
-    // return textToSpeech(text);
     const polly = new Polly();
     const params = {
       OutputFormat: 'mp3',
@@ -65,7 +50,6 @@ const PlaceCard = ({ place }) => {
         audioRef.current.play();
       }
     });
-    // TODO: add a feature to calculate distance and travel time from current location.
   };
 
   const editPlace = async () => {

@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+require('dotenv').config();
+
+const openAIKey = process.env.OPEN_API_KEY;
 const api = axios.create({
     baseURL: 'https://x5cbyxsmwl.execute-api.us-west-2.amazonaws.com/api',
 });
@@ -89,4 +92,38 @@ export const textToSpeech = async (text) => {
     }
 }
 
-// export default { api };
+export const fetchOpenAIResponse = async (promptText) => {
+    const headers = {
+      'Authorization': `Bearer ${openAIKey}`,
+      'Content-Type': 'application/json',
+    };
+
+    const OPENAI_API_URL = 'https://api.openai.com/v1/completions';
+  
+    const data = {
+      model: "gpt-3.5-turbo-instruct",
+      prompt: promptText,
+      max_tokens: 250, // Adjust as needed
+      temperature: 0
+    };
+  
+    try {
+      const response = await axios.post(OPENAI_API_URL, data, { headers });
+      console.log(`open ai response`, response);
+      return response.data.choices[0].text;
+    } catch (error) {
+      console.error('Error calling OpenAI API:', error);
+      throw error;
+    }
+};
+
+export const generatePlaces = async (text) => {
+    try {
+      const prompt = `Extract from the given text and write in a JSON list containing keys as "name" and "notes" about the place if you find any. Don't hallucinate. : ${text.paragraph}` 
+      const response = await fetchOpenAIResponse(prompt);
+      console.log(`response`, response);
+      return response;
+    } catch (error) {
+      console.error('Error:', error);
+    }
+}
