@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../assets/styles/SliderCard.css';
-import SFMap from '../assets/img/SFMap.jpg';
+// import SFMap from '../assets/img/SFMap.jpg';
+import MyMapComponent from './MyMapComponent';
 
-const SliderCard = ({ alwaysVisibleContent, expandedContent }) => {
+const SliderCard = ({ places, alwaysVisibleContent, expandedContent }) => {
   let [isExpanded, setIsExpanded] = useState(false);
   // let [startY, setStartY] = useState(0);
   const initialHeight = useRef(350); // Initial card height in px
@@ -70,7 +71,8 @@ const SliderCard = ({ alwaysVisibleContent, expandedContent }) => {
   return (
     <>
       <div className="h-screen w-screen">
-        <img src={SFMap} alt="SF Map background" className="h-full w-full object-cover" />
+        {/* <img src={SFMap} alt="SF Map background" className="h-full w-full object-cover" /> */}
+        <MyMapComponent places={places} />
       </div>
       <div className="relative h-screen z-30">
         {isExpanded && <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>}

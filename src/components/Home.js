@@ -5,6 +5,7 @@ import SliderCard from '../components/SliderCard';
 import ArrowRight from '../components/icons/IconArrowRight';
 import { getPlaces, addPlace } from '../api';
 import PlacesContext from '../contexts/PlacesContext';
+import { MapCenterProvider } from '../contexts/MapCenterContext';
 
 const Home = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -89,13 +90,13 @@ const Home = () => {
         }
         await navigator.geolocation.getCurrentPosition(
             (position) => {
-              
-              console.log(`position`, position.coords.latitude, position.coords.longitude);
-              setLat(position.coords.latitude);
-              setLng(position.coords.longitude);
-              console.log(`location`, lat, lng);
-              setIsLoading(false);
-            //   fetchPlaces();
+
+                console.log(`position`, position.coords.latitude, position.coords.longitude);
+                setLat(position.coords.latitude);
+                setLng(position.coords.longitude);
+                console.log(`location`, lat, lng);
+                setIsLoading(false);
+                //   fetchPlaces();
             },
             () => {
                 console.log('Unable to retrieve your location');
@@ -125,92 +126,96 @@ const Home = () => {
 
     return (
         <PlacesContext.Provider value={{ places, setPlaces }}>
-            <Layout>
-                <SliderCard className="place-items-center px-4 pt-20 sm:px-6 lg:px-8 pb-20"
-                    alwaysVisibleContent={
-                        <>
-                        {isLoading && (
-                            <div className="flex items-center justify-center">
-                                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-4 
+            <MapCenterProvider>
+                <Layout>
+                    <SliderCard
+                        places={places}
+                        className="place-items-center px-4 pt-20 sm:px-6 lg:px-8 pb-20"
+                        alwaysVisibleContent={
+                            <>
+                                {isLoading && (
+                                    <div className="flex items-center justify-center">
+                                        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-4 
                                 border-gray-200"></div>
-                            </div>
-                        )}
-                        {!isLoading && (
-                            <Places
-                                places={places}
-                                addListUrl={() => toggleVisibility('mapsListURLInput')}
-                                addText={() => toggleVisibility('paragraphInput')}
-                                addPlace={() => toggleVisibility('placeText')}
-                            />
-                        )}
-                        </>
-                    }
-                    expandedContent={
-                        <>
-                        {visibility.mapsListURLInput && (
-                            <div className="flex">
-                                <label htmlFor="mapsURL" className="w-full ml-1 mr-2 relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
-                                    <input
-                                        type="text"
-                                        id="mapsURL"
-                                        placeholder="Enter Google Maps Curated List URL"
-                                        className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 active:border-transparent sm:text-sm"
+                                    </div>
+                                )}
+                                {!isLoading && (
+                                    <Places
+                                        places={places}
+                                        addListUrl={() => toggleVisibility('mapsListURLInput')}
+                                        addText={() => toggleVisibility('paragraphInput')}
+                                        addPlace={() => toggleVisibility('placeText')}
                                     />
-                                    <span className="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs">
-                                        Google Maps List URL
-                                    </span>
-                                </label>
-                                <button
-                                    className="inline-block rounded-full border border-indigo-600 p-3 text-indigo-600 hover:bg-indigo-600 hover:text-white focus:outline-none focus:ring active:bg-indigo-500"
-                                    onClick={submitMapsListURL}
-                                >
-                                    <span className="sr-only">Submit</span>
-                                    <ArrowRight /> {/* Assuming ArrowRight is a React component */}
-                                    {/* Loader if needed */}
-                                </button>
-                            </div>
-                        )}
-                        {visibility.placeText && (
-                            <div className="flex">
-                                <div className="mr-2 w-full">
-                                    <label htmlFor="placeName" className="w-full ml-1 mr-2 relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
-                                        <input
-                                            type="text"
-                                            id="placeName"
-                                            placeholder="Enter Place Name"
-                                            className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 active:border-transparent sm:text-sm"
-                                        />
-                                        <span className="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs">
-                                            Place Name
-                                        </span>
-                                    </label>
-                                    <label htmlFor="placeNotes" className="w-full ml-1 mr-2 relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
-                                        <input
-                                            type="text"
-                                            id="placeNotes"
-                                            placeholder="Enter Notes"
-                                            className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 active:border-transparent sm:text-sm"
-                                        />
-                                        <span className="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs">
-                                            Place Notes
-                                        </span>
-                                    </label>
-                                </div>
-                                <button
-                                    className="inline-block rounded-full border border-indigo-600 p-3 text-indigo-600 hover:bg-indigo-600 hover:text-white focus:outline-none focus:ring active:bg-indigo-500"
-                                    onClick={submitPlaceDetails}
-                                >
-                                    <span className="sr-only">Submit</span>
-                                    <ArrowRight /> {/* Assuming ArrowRight is a React component */}
-                                    {/* Loader if needed */}
-                                </button>
-                            </div>
-                        )}
-                        </>
-                    }
-                >
-                </SliderCard >
-            </Layout >
+                                )}
+                            </>
+                        }
+                        expandedContent={
+                            <>
+                                {visibility.mapsListURLInput && (
+                                    <div className="flex">
+                                        <label htmlFor="mapsURL" className="w-full ml-1 mr-2 relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
+                                            <input
+                                                type="text"
+                                                id="mapsURL"
+                                                placeholder="Enter Google Maps Curated List URL"
+                                                className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 active:border-transparent sm:text-sm"
+                                            />
+                                            <span className="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs">
+                                                Google Maps List URL
+                                            </span>
+                                        </label>
+                                        <button
+                                            className="inline-block rounded-full border border-indigo-600 p-3 text-indigo-600 hover:bg-indigo-600 hover:text-white focus:outline-none focus:ring active:bg-indigo-500"
+                                            onClick={submitMapsListURL}
+                                        >
+                                            <span className="sr-only">Submit</span>
+                                            <ArrowRight /> {/* Assuming ArrowRight is a React component */}
+                                            {/* Loader if needed */}
+                                        </button>
+                                    </div>
+                                )}
+                                {visibility.placeText && (
+                                    <div className="flex">
+                                        <div className="mr-2 w-full">
+                                            <label htmlFor="placeName" className="w-full ml-1 mr-2 relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
+                                                <input
+                                                    type="text"
+                                                    id="placeName"
+                                                    placeholder="Enter Place Name"
+                                                    className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 active:border-transparent sm:text-sm"
+                                                />
+                                                <span className="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs">
+                                                    Place Name
+                                                </span>
+                                            </label>
+                                            <label htmlFor="placeNotes" className="w-full ml-1 mr-2 relative block overflow-hidden rounded-md border border-gray-200 px-3 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600">
+                                                <input
+                                                    type="text"
+                                                    id="placeNotes"
+                                                    placeholder="Enter Notes"
+                                                    className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 active:border-transparent sm:text-sm"
+                                                />
+                                                <span className="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-3 peer-focus:text-xs">
+                                                    Place Notes
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <button
+                                            className="inline-block rounded-full border border-indigo-600 p-3 text-indigo-600 hover:bg-indigo-600 hover:text-white focus:outline-none focus:ring active:bg-indigo-500"
+                                            onClick={submitPlaceDetails}
+                                        >
+                                            <span className="sr-only">Submit</span>
+                                            <ArrowRight /> {/* Assuming ArrowRight is a React component */}
+                                            {/* Loader if needed */}
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        }
+                    >
+                    </SliderCard >
+                </Layout >
+            </MapCenterProvider>
         </PlacesContext.Provider>
     );
 };

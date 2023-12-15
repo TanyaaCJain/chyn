@@ -3,9 +3,11 @@ import PlacesContext from '../../contexts/PlacesContext';
 import IconEdit from '../icons/IconEdit';
 import IconDelete from '../icons/IconDelete';
 import IconArrowRight from '../icons/IconArrowRight';
+import IconMapPin from '../icons/IconMapPin';
 import '../../assets/styles/PlaceCard.css';
 import { updatePlace, deletePlace } from '../../api';
 import { Polly } from 'aws-sdk';
+import { MapCenterContext } from '../../contexts/MapCenterContext';
 
 const PlaceCard = ({ place }) => {
   const audioRef = useRef(null);
@@ -15,6 +17,7 @@ const PlaceCard = ({ place }) => {
   const [visibility, setVisibility] = useState({
     editField: false
   });
+  const { setMapCenter } = useContext(MapCenterContext);
 
   // useEffect
   useEffect(() => {
@@ -99,7 +102,7 @@ const PlaceCard = ({ place }) => {
               {/* icon size 24 */}
               {/* check iff place has key 'dis' then display with round off to two decimal places */}
               {place.dis && <>
-                <p className="text-xs font-medium">{place.dis.toFixed(2)}</p>
+                <p className="text-xs font-medium">{place.dis.toFixed(2)} mi</p>
                 <span className="hidden sm:block" aria-hidden="true">&middot;</span>
               </>}
               <strong className="rounded border border-light-gray-500 bg-gray-0 px-2 py-0.25 text-[10px] font-medium hover:bg-gray-100">
@@ -136,6 +139,14 @@ const PlaceCard = ({ place }) => {
         </div>
         <div>
           <span className="inline-flex overflow-hidden rounded-md border bg-white shadow-sm">
+            <button
+              onClick={() => setMapCenter(place)}
+              className="inline-block border-e p-3 text-gray-700 hover:bg-gray-50 focus:relative"
+              title="Show on Map"
+              aria-label="Show on Map"
+            >
+              <IconMapPin />
+            </button>
             <button
               onClick={() => toggleVisibility('editField')}
               className="inline-block border-e p-3 text-gray-700 hover:bg-gray-50 focus:relative"
